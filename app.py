@@ -42,6 +42,9 @@ from resources.auth import api as auth_ns
 from resources.rooms import api as rooms_ns
 import signaling  # Import signaling to register SocketIO events
 
+# Initialize SocketIO signaling
+signaling.init_socketio(socketio)
+
 api.add_namespace(auth_ns, path="/auth")
 api.add_namespace(rooms_ns, path="/rooms")
 
@@ -78,6 +81,11 @@ def health():
 
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-    socketio.run(app, debug=True)
+    try:
+        with app.app_context():
+            db.create_all()
+        socketio.run(app, host='127.0.0.1', port=5000)
+    except Exception as e:
+        print(f"Error starting server: {e}")
+        import traceback
+        traceback.print_exc()
