@@ -1,3 +1,4 @@
+import os
 from flask import Flask, redirect, jsonify
 from flask_restx import Api
 from flask_jwt_extended import JWTManager
@@ -7,7 +8,6 @@ from config import Config
 from models import db, bcrypt
 from errors import APIError
 from jwt.exceptions import DecodeError, InvalidTokenError
-import os
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -41,9 +41,8 @@ api = Api(
 
 from resources.auth import api as auth_ns
 from resources.rooms import api as rooms_ns
-import signaling  # Import signaling to register SocketIO events
+import signaling
 
-# Initialize SocketIO signaling
 signaling.init_socketio(socketio)
 
 api.add_namespace(auth_ns, path="/auth")
@@ -79,7 +78,6 @@ def home():
 @app.route("/api/health")
 def health():
     return {"status": "healthy"}, 200
-
 
 if __name__ == "__main__":
     try:
