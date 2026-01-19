@@ -14,8 +14,8 @@ app.config.from_object(Config)
 db.init_app(app)
 bcrypt.init_app(app)
 jwt = JWTManager(app)
-CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*")  # Initialize SocketIO with CORS
+CORS(app, origins=["https://videocha.netlify.app", "https://storied-parfait-acbc19.netlify.app", "http://localhost:3000"])
+socketio = SocketIO(app, cors_allowed_origins=["https://videocha.netlify.app", "https://storied-parfait-acbc19.netlify.app", "http://localhost:3000"])
 
 @jwt.invalid_token_loader
 def invalid_token_callback(error):
