@@ -15,6 +15,30 @@ join_model = api.model("JoinRoom", {
 })
 
 
+@api.route("/create-simple")
+class CreateSimpleRoom(Resource):
+    @api.expect(room_model)
+    def post(self):
+        """Create a room without authentication for MVP"""
+        try:
+            data = api.payload
+            if Room.query.filter_by(name=data["name"]).first():
+                raise APIError("Room already exists", 400)
+
+            room_id = str(uuid.uuid4())
+            room = Room(name=data["name"], room_id=room_id)
+            db.session.add(room)
+            db.session.commit()
+            return {"id": room.id, "name": room.name, "room_id": room.room_id}, 201
+        except APIError:
+            raise
+        except ValueError as e:
+            raise APIError(str(e), 400)
+        except Exception as e:
+            db.session.rollback()
+            raise APIError(f"Error creating room: {str(e)}", 500)
+
+
 @api.route("/")
 class RoomList(Resource):
     def get(self):
