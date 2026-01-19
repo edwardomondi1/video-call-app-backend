@@ -1,3 +1,4 @@
+import os
 from flask import Flask, redirect, jsonify
 from flask_restx import Api
 from flask_jwt_extended import JWTManager
@@ -40,9 +41,8 @@ api = Api(
 
 from resources.auth import api as auth_ns
 from resources.rooms import api as rooms_ns
-import signaling  # Import signaling to register SocketIO events
+import signaling
 
-# Initialize SocketIO signaling
 signaling.init_socketio(socketio)
 
 api.add_namespace(auth_ns, path="/auth")
@@ -79,13 +79,12 @@ def home():
 def health():
     return {"status": "healthy"}, 200
 
-
 if __name__ == "__main__":
     try:
         with app.app_context():
             db.create_all()
-        socketio.run(app, host='127.0.0.1', port=5000)
+        port = int(os.environ.get("PORT", 5002))
+        print(f"Starting server on port {port}")
+        socketio.run(app, host='0.0.0.0', port=port, debug=False)
     except Exception as e:
         print(f"Error starting server: {e}")
-        import traceback
-        traceback.print_exc()
