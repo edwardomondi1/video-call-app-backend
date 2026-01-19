@@ -14,3 +14,4 @@ class Config:
     ).replace("\\", "/")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "jwt-secret")
+    PORT = int(os.getenv("PORT", 5002))

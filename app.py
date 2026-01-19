@@ -7,6 +7,7 @@ from config import Config
 from models import db, bcrypt
 from errors import APIError
 from jwt.exceptions import DecodeError, InvalidTokenError
+import os
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -84,7 +85,8 @@ if __name__ == "__main__":
     try:
         with app.app_context():
             db.create_all()
-        print("Starting server on http://127.0.0.1:5002")
-        socketio.run(app, host='0.0.0.0', port=5002, debug=False)
+        port = int(os.environ.get("PORT", 5002))
+        print(f"Starting server on port {port}")
+        socketio.run(app, host='0.0.0.0', port=port, debug=False)
     except Exception as e:
         print(f"Error starting server: {e}")
