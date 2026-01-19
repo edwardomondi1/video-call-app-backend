@@ -16,7 +16,7 @@ app.config.from_object(Config)
 db.init_app(app)
 bcrypt.init_app(app)
 jwt = JWTManager(app)
-CORS(app, origins=["https://convo12.netlify.app"])  # Allow only your frontend
+CORS(app, origins=["https://convo12.netlify.app", "http://localhost:3000"])  # Allow frontend origins
 
 # JWT error handlers
 @jwt.invalid_token_loader
@@ -67,8 +67,9 @@ def index():
 @app.route("/home")
 def home():
     return {
-        "message": "Video Call API",
+        "message": "Video Call API - Ready for deployment",
         "version": "1.0",
+        "status": "operational",
         "endpoints": {
             "docs": "/docs",
             "health": "/api/health",
