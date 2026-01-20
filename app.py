@@ -54,9 +54,9 @@ def handle_api_error(error):
 
 @api.errorhandler(Exception)
 def handle_exception(error):
-    import traceback
-    traceback.print_exc()
-    return {"message": str(error)}, 500
+    import logging
+    logging.error(f"Unhandled exception: {error}", exc_info=True)
+    return {"message": "Internal server error"}, 500
 
 @app.route("/")
 def index():
@@ -77,7 +77,15 @@ def home():
 
 @app.route("/api/health")
 def health():
-    return {"status": "healthy"}, 200
+    return {"status": "healthy", "message": "Backend is running"}, 200
+
+@app.route("/api/test-connection")
+def test_connection():
+    return {
+        "status": "connected",
+        "message": "Frontend-Backend connection successful",
+        "cors_origins": ["https://videocha.netlify.app", "https://storied-parfait-acbc19.netlify.app"]
+    }, 200
 
 if __name__ == "__main__":
     try:
@@ -85,6 +93,7 @@ if __name__ == "__main__":
             db.create_all()
         port = int(os.environ.get("PORT", 5002))
         print(f"Starting server on port {port}")
-        socketio.run(app, host='0.0.0.0', port=port, debug=False)
+        debug = os.environ.get("DEBUG", "False").lower() == "true"
+        socketio.run(app, host='0.0.0.0', port=port, debug=debug)
     except Exception as e:
         print(f"Error starting server: {e}")

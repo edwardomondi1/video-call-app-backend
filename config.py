@@ -7,11 +7,18 @@ load_dotenv()
 BASE_DIR = Path(__file__).parent
 
 class Config:
-    SECRET_KEY = os.getenv("SECRET_KEY", "secret-key")
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    if not SECRET_KEY:
+        raise ValueError("SECRET_KEY environment variable is required")
+    
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL",
         f"sqlite:///{BASE_DIR / 'video_call.db'}"
     ).replace("\\", "/")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "jwt-secret")
+    
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+    if not JWT_SECRET_KEY:
+        raise ValueError("JWT_SECRET_KEY environment variable is required")
+    
     PORT = int(os.getenv("PORT", 5002))

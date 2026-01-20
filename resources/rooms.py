@@ -71,11 +71,19 @@ class RoomList(Resource):
 class JoinRoom(Resource):
     @api.expect(join_model)
     def post(self):
-        data = api.payload
-        room = Room.query.filter_by(room_id=data["room_id"], is_active=True).first()
-        if not room:
-            raise APIError("Room not found", 404)
-        return {"id": room.id, "name": room.name, "room_id": room.room_id}, 200
+        try:
+            data = api.payload
+            if not data or not data.get("room_id"):
+                raise APIError("room_id is required", 400)
+            
+            room = Room.query.filter_by(room_id=data["room_id"], is_active=True).first()
+            if not room:
+                raise APIError("Room not found", 404)
+            return {"id": room.id, "name": room.name, "room_id": room.room_id}, 200
+        except APIError:
+            raise
+        except Exception as e:
+            raise APIError("Error joining room", 500)
 
 
 @api.route("/<int:room_id>")
@@ -88,10 +96,16 @@ class RoomDetail(Resource):
 
     @jwt_required()
     def delete(self, room_id):
-        room = db.session.get(Room, room_id)
-        if not room:
-            raise APIError("Room not found", 404)
-        
-        room.is_active = False
-        db.session.commit()
-        return {"message": "Room deleted"}, 200
+        try:
+            room = db.session.get(Room, room_id)
+            if not room:
+                raise APIError("Room not found", 404)
+            
+            room.is_active = False
+            db.session.commit()
+            return {"message": "Room deleted"}, 200
+        except APIError:
+            raise
+        except Exception as e:
+            db.session.rollback()
+            raise APIError("Error deleting room", 500)
